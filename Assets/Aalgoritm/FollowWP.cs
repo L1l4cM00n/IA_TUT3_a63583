@@ -20,7 +20,7 @@ public class Follow : MonoBehaviour
         g = wpManager.GetComponent<WPManager>().graph;
         currentNode = wps[0];
 
-        Invoke("GoToRuin", 2);
+        
     }
 
 
@@ -33,6 +33,12 @@ public class Follow : MonoBehaviour
     public void GoToRuin()
     {
         g.AStar(currentNode, wps[1]);
+        currentWP = 0;
+    }
+    
+    public void GoToFactory()
+    {
+        g.AStar(currentNode, wps[2]);
         currentWP = 0;
     }
     // Update is called once per frame
