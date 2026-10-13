@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 [System.Serializable]
 public struct Link
 {
@@ -9,20 +8,34 @@ public struct Link
     public GameObject node2;
     public direction dir;
 }
+
 public class WPManager : MonoBehaviour
 {
     public GameObject[] waypoints;
     public Link[] links;
+    public Graph graph = new Graph();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (waypoints.Length > 0)
+        {
+            foreach (GameObject waypoint in waypoints)
+            {
+                graph.AddNode(waypoint);
+            }
 
+            foreach (Link link in links)
+            {
+                graph.AddEdge(link.node1, link.node2);
+                if (link.dir == Link.direction.BI)
+                {
+                    graph.AddEdge(link.node2, link.node1);
+                }
+            }
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-
     }
 }

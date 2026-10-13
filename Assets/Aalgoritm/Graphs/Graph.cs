@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Graph
 {
     List<Edge> edges = new List<Edge>();
     List<Node> nodes = new List<Node>();
-    List<Node> pathList = new List<Node>();
-    
-    public Graph () { }
+    public List<Node> pathList = new List<Node>();
+
+    public Graph() { }
 
     public void AddNode(GameObject id)
     {
@@ -34,7 +33,7 @@ public class Graph
     {
         foreach (Node n in nodes)
         {
-            if(n.getId() == id)
+            if (n.getId() == id)
                 return n;
         }
 
@@ -50,7 +49,7 @@ public class Graph
         {
             return false;
         }
-        
+
         List<Node> open = new List<Node>();
         List<Node> closed = new List<Node>();
         float tentative_g_score = 0;
@@ -59,21 +58,22 @@ public class Graph
         start.g = 0;
         start.h = distance(start, end);
         start.f = start.h;
-        
+
         open.Add(start);
         while (open.Count > 0)
         {
             int i = lowestF(open);
             Node thisNode = open[i];
-            open.RemoveAt(i);
+
             if (thisNode.getId() == endId)
             {
-                //ReconstructPath(start, end);
+                ReconstructPath(start, end);
                 return true;
             }
-            
+
             open.RemoveAt(i);
             closed.Add(thisNode);
+
             Node neighbour;
             foreach (Edge e in thisNode.edgeList)
             {
@@ -81,7 +81,7 @@ public class Graph
 
                 if (closed.IndexOf(neighbour) > -1)
                     continue;
-                
+
                 tentative_g_score = thisNode.g + distance(thisNode, neighbour);
                 if (open.IndexOf(neighbour) == -1)
                 {
@@ -93,41 +93,55 @@ public class Graph
                     tentative_is_better = true;
                 }
                 else
+                {
                     tentative_is_better = false;
+                }
 
                 if (tentative_is_better)
                 {
                     neighbour.cameFrom = thisNode;
                     neighbour.g = tentative_g_score;
-                    neighbour.h = distance(thisNode, end);
+                    neighbour.h = distance(neighbour, end);
                     neighbour.f = neighbour.g + neighbour.h;
                 }
             }
         }
         return false;
     }
+    
+    
+
+    public void ReconstructPath(Node startId, Node endId)
+    {
+        pathList.Clear();
+        pathList.Add(endId);
+
+        var p = endId.cameFrom;
+        while (p != startId && p != null)
+        {
+            pathList.Insert(0, p);
+            p = p.cameFrom;
+        }
+        pathList.Insert(0, startId);
+    }
 
     float distance(Node a, Node b)
     {
-        return (Vector3.SqrMagnitude(a.getId().transform.position - b.getId().transform.position));
+        return Vector3.SqrMagnitude(a.getId().transform.position - b.getId().transform.position);
     }
 
     int lowestF(List<Node> l)
     {
-        float lowestf = 0;
-        int count = 0;
+        float lowestf = l[0].f;
         int iteratorCount = 0;
 
-        lowestf = l[0].f;
-
-        for (int i = l; i < l.Count; i++)
+        for (int i = 1; i < l.Count; i++)
         {
             if (l[i].f < lowestf)
             {
                 lowestf = l[i].f;
-                iteratorCount = count;
+                iteratorCount = i;
             }
-            count++;
         }
         return iteratorCount;
     }
